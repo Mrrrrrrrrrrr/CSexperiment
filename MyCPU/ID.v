@@ -1,4 +1,4 @@
-`include "lib/defines.vh"
+`include "defines.vh"
 module ID(
     input wire clk,
     input wire rst,
@@ -12,6 +12,10 @@ module ID(
     input wire [31:0] inst_sram_rdata,
 
     input wire [`WB_TO_RF_WD-1:0] wb_to_rf_bus,
+    
+    input wire [`EX_TO_ID_WD-1:0] ex_to_id_bus,
+    
+    input wire [`MEM_TO_ID_WD-1:0] mem_to_id_bus,
 
     output wire [`ID_TO_EX_WD-1:0] id_to_ex_bus,
 
@@ -23,9 +27,18 @@ module ID(
     wire [31:0] id_pc;
     wire ce;
 
+    wire ex_id_we;
+    wire [4:0] ex_id_waddr;
+    wire [31:0] ex_id_wdata;
+    
+    wire mem_id_we;
+    wire [4:0] mem_id_waddr;
+    wire [31:0] mem_id_wdata;
+    
     wire wb_rf_we;
     wire [4:0] wb_rf_waddr;
     wire [31:0] wb_rf_wdata;
+    
 
     always @ (posedge clk) begin
         if (rst) begin
@@ -52,6 +65,16 @@ module ID(
         wb_rf_waddr,
         wb_rf_wdata
     } = wb_to_rf_bus;
+    assign {
+        ex_id_we,
+        ex_id_waddr,
+        ex_id_wdata
+    } = ex_to_id_bus;
+    assign {
+        mem_id_we,
+        mem_id_waddr,
+        mem_id_wdata
+    } = mem_to_id_bus;
 
     wire [5:0] opcode;
     wire [4:0] rs,rt,rd,sa;
@@ -78,7 +101,7 @@ module ID(
     wire sel_rf_res;
     wire [2:0] sel_rf_dst;
 
-    wire [31:0] rdata1, rdata2;
+    wire [31:0] rdata1, rdata2, data1, data2;
 
     regfile u_regfile(
     	.clk    (clk    ),
@@ -208,7 +231,12 @@ module ID(
 
     // 0 from alu_res ; 1 from ld_res
     assign sel_rf_res = 1'b0; 
+    
+    
+    assign data1 = (ex_id_we && rs == ex_id_waddr) ? ex_id_wdata : ((mem_id_we && rs == mem_id_waddr) ? mem_id_wdata : rdata1);
 
+    assign data2 = (ex_id_we && rt == ex_id_waddr) ? ex_id_wdata : ((mem_id_we && rt == mem_id_waddr) ? mem_id_wdata : rdata2);
+    
     assign id_to_ex_bus = {
         id_pc,          // 158:127
         inst,           // 126:95
@@ -220,8 +248,8 @@ module ID(
         rf_we,          // 70
         rf_waddr,       // 69:65
         sel_rf_res,     // 64
-        rdata1,         // 63:32
-        rdata2          // 31:0
+        data1,         // 63:32
+        data2          // 31:0
     };
 
 
