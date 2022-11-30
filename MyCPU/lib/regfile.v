@@ -1,4 +1,4 @@
-`include "defines.vh"
+`include "lib/defines.vh"
 module regfile(
     input wire clk,
     input wire [4:0] raddr1,
