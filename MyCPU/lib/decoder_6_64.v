@@ -1,4 +1,4 @@
-`include "lib/defines.vh"
+`include "defines.vh"
 module decoder_6_64 (
     input wire [5:0] in,
     output reg [63:0] out
