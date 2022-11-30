@@ -1,4 +1,4 @@
-`include "lib/defines.vh"
+`include "defines.vh"
 module alu(
     input wire [11:0] alu_control,
     input wire [31:0] alu_src1,
