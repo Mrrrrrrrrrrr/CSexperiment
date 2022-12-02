@@ -11,3 +11,7 @@ QMR：
 
 2022.11.30
 完成指令SUBU、JR、JAL的添加。目前到达PC值bfc05114。
+
+LPD：
+2022.12.02
+完成指令ADDU、BNE、SLL、OR的添加。目前到达PC值bfc00d58。
