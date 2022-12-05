@@ -8,6 +8,9 @@
 `define EX_TO_RF_WD 38
 `define MEM_TO_RF_WD 38
 
+`define LoadBus 5
+`define SaveBus 3
+
 `define StallBus 6
 `define NoStop 1'b0
 `define Stop 1'b1

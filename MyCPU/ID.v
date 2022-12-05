@@ -19,7 +19,10 @@ module ID(
 
     output wire [`ID_TO_EX_WD-1:0] id_to_ex_bus,
 
-    output wire [`BR_WD-1:0] br_bus
+    output wire [`BR_WD-1:0] br_bus,
+    
+    output wire [`LoadBus-1:0] id_load_bus,
+    output wire [`SaveBus-1:0] id_save_bus
 );
 
     reg [`IF_TO_ID_WD-1:0] if_to_id_bus_r;
@@ -132,7 +135,8 @@ module ID(
     wire inst_bne, inst_sll, inst_or, inst_xor;
     wire inst_lw, inst_sw, inst_add, inst_addi;
     wire inst_sub, inst_slt, inst_slti, inst_sltu;
-    wire inst_sltiu;
+    wire inst_sltiu, inst_lb, inst_lbu, inst_lh;
+    wire inst_lhu, inst_sb, inst_sh;
 
     wire op_add, op_sub, op_slt, op_sltu;
     wire op_and, op_nor, op_or, op_xor;
@@ -180,6 +184,12 @@ module ID(
     assign inst_slti    = op_d[6'b00_1010];
     assign inst_sltu    = op_d[6'b00_0000] & func_d[6'b10_1011];
     assign inst_sltiu   = op_d[6'b00_1011];
+    assign inst_lb      = 1'b0;
+    assign inst_lbu     = 1'b0;
+    assign inst_lh      = 1'b0;
+    assign inst_lhu     = 1'b0;
+    assign inst_sb      = 1'b0;
+    assign inst_sh      = 1'b0;
 
 
     // rs to reg1
@@ -315,5 +325,18 @@ module ID(
         br_addr
     };
 
+    assign id_load_bus = {
+        inst_lb,
+        inst_lbu,
+        inst_lh,
+        inst_lhu,
+        inst_lw
+    };
+    
+    assign id_save_bus = {
+        inst_sb,
+        inst_sh,
+        inst_sw
+    };
 
 endmodule
