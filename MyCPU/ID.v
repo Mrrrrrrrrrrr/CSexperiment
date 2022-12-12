@@ -63,7 +63,7 @@ module ID(
             if_to_id_bus_r <= if_to_id_bus;
             flag <= 1'b0;
         end
-        else if (stall[1]==`Stop && stall[2]==`NoStop && ~flag) begin
+        else if (stall[1]==`Stop && stall[2]==`Stop && ~flag) begin
             flag <= 1'b1;
             pre_inst <= inst_sram_rdata;
         end
@@ -148,7 +148,8 @@ module ID(
     wire inst_sub, inst_slt, inst_slti, inst_sltu;
     wire inst_sltiu, inst_lb, inst_lbu, inst_lh;
     wire inst_lhu, inst_sb, inst_sh , inst_and;
-    wire inst_andi, inst_nor, inst_xori ;
+    wire inst_andi, inst_nor, inst_xori ,inst_sllv ;
+    wire inst_srav, inst_sra, inst_srlv ,inst_srl;
 
     wire op_add, op_sub, op_slt, op_sltu;
     wire op_and, op_nor, op_or, op_xor;
@@ -202,10 +203,15 @@ module ID(
     assign inst_lhu     = 1'b0;
     assign inst_sb      = 1'b0;
     assign inst_sh      = 1'b0;
-    assign inst_and     = op_d[6'b00_0000] & func_d[6'b100100];
-    assign inst_andi    = op_d[6'b001100];
-    assign inst_nor     = op_d[6'b00_0000] & func_d[6'b100111];
+    assign inst_and     = op_d[6'b00_0000] & func_d[6'b10_0100];
+    assign inst_andi    = op_d[6'b00_1100];
+    assign inst_nor     = op_d[6'b00_0000] & func_d[6'b10_0111];
     assign inst_xori    = op_d[6'b00_1110];
+    assign inst_srl     = op_d[6'b10_0000] & func_d[6'b00_0010];
+    assign inst_sllv    = op_d[6'b00_0000] & func_d[6'b00_0100];
+    assign inst_srav    = op_d[6'b00_0000] & func_d[6'b00_0111];
+    assign inst_sra     = op_d[6'b00_0000] & func_d[6'b00_0011];
+    assign inst_srlv    = op_d[6'b00_0000] & func_d[6'b00_0110];
 
     assign stallreq = (pre_inst_is_load & ex_rf_we & (rs == ex_rf_waddr | rt == ex_rf_waddr)) ? 1'b1 : 1'b0;
 
@@ -214,21 +220,22 @@ module ID(
                              inst_addu | inst_or | inst_xor | inst_lw | inst_sw |
                              inst_add | inst_addi | inst_sub | inst_slt | inst_slti |
                              inst_sltu | inst_sltiu | inst_and |inst_andi | inst_nor |
-                             inst_xori
+                             inst_xori | inst_sllv | inst_srav |inst_srlv;
                             ;
 
     // pc to reg1
     assign sel_alu_src1[1] = inst_jal;
 
     // sa_zero_extend to reg1
-    assign sel_alu_src1[2] = inst_sll;
+    assign sel_alu_src1[2] = inst_sll | inst_srl | inst_sra ;
 
     
     // rt to reg2
     assign sel_alu_src2[0] = inst_subu | inst_addu | inst_sll | inst_or | inst_xor |
                              inst_add | inst_sub | inst_slt | inst_sltu | inst_and |
-                             inst_nor ;
-    
+                             inst_nor | inst_srl | inst_sllv | inst_srav| inst_sra |
+                             inst_srlv ;
+
     // imm_sign_extend to reg2
     assign sel_alu_src2[1] = inst_lui | inst_addiu | inst_lw | inst_sw | inst_addi |
                              inst_slti | inst_sltiu;    
@@ -250,9 +257,9 @@ module ID(
     assign op_nor = inst_nor ;
     assign op_or = inst_ori | inst_or;
     assign op_xor = inst_xor | inst_xori ;
-    assign op_sll = inst_sll;
-    assign op_srl = 1'b0;
-    assign op_sra = 1'b0;
+    assign op_sll = inst_sll | inst_sllv;
+    assign op_srl = inst_srl | inst_srlv;
+    assign op_sra = inst_srav| inst_sra ;
     assign op_lui = inst_lui;
 
     assign alu_op = {op_add, op_sub, op_slt, op_sltu,
@@ -274,14 +281,16 @@ module ID(
                    inst_addu | inst_sll | inst_or | inst_xor | inst_lw |
                    inst_add | inst_addi | inst_sub | inst_slt | inst_slti |
                    inst_sltu | inst_sltiu| inst_and | inst_andi | inst_nor |
-                   inst_xori ;
+                   inst_xori | inst_srl | inst_sllv | inst_srav | inst_sra |
+                   inst_srlv;
 
 
 
     // store in [rd]
-    assign sel_rf_dst[0] = inst_subu | inst_addu | inst_sll | inst_or | inst_xor |
+    assign sel_rf_dst[0] = inst_subu | inst_addu | inst_sll  | inst_or | inst_xor |
                            inst_add | inst_sub | inst_slt | inst_sltu | inst_and |
-                           inst_nor ;
+                           inst_nor | inst_srl | inst_sllv | inst_srav| inst_sra |
+                           inst_srlv; 
     // store in [rt] 
     assign sel_rf_dst[1] = inst_ori | inst_lui | inst_addiu | inst_lw | inst_addi |
                            inst_slti | inst_sltiu |inst_andi | inst_xori;
