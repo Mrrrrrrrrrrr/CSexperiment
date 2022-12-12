@@ -20,7 +20,8 @@ module EX(
     output wire [31:0] data_sram_addr,
     output wire [31:0] data_sram_wdata,
     
-    output wire [`LoadBus-1:0] ex_load_bus
+    output wire [`LoadBus-1:0] ex_load_bus,
+    output wire pre_inst_is_load
 );
 
     reg [`ID_TO_EX_WD-1:0] id_to_ex_bus_r;
@@ -142,6 +143,8 @@ module EX(
         inst_lhu,
         inst_lw
     };
+
+    assign pre_inst_is_load = inst_lb | inst_lbu | inst_lh | inst_lhu | inst_lw;
 
     // MUL part
     wire [63:0] mul_result;
