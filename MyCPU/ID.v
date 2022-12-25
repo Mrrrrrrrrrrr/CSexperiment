@@ -211,15 +211,17 @@ module ID(
     assign inst_andi    = op_d[6'b00_1100];
     assign inst_nor     = op_d[6'b00_0000] & func_d[6'b10_0111];
     assign inst_xori    = op_d[6'b00_1110];
-    assign inst_srl     = op_d[6'b10_0000] & func_d[6'b00_0010];
+
+
+    assign inst_srl     = op_d[6'b00_0000] & func_d[6'b00_0010];
     assign inst_sllv    = op_d[6'b00_0000] & func_d[6'b00_0100];
     assign inst_srav    = op_d[6'b00_0000] & func_d[6'b00_0111];
     assign inst_sra     = op_d[6'b00_0000] & func_d[6'b00_0011];
     assign inst_srlv    = op_d[6'b00_0000] & func_d[6'b00_0110];
 
-
     assign inst_bgez    = op_d[6'b00_0001] & rt_d[5'b0_0001];
     assign inst_bgtz    = op_d[6'b00_0111] & rt_d[5'b0_0000];
+
     assign inst_blez    = op_d[6'b00_0110] & rt_d[5'b0_0000];
     assign inst_bltz    = op_d[6'b00_0001] & rt_d[5'b0_0000];
     assign inst_bgezal  = op_d[6'b00_0001] & rt_d[5'b1_0001];
@@ -227,10 +229,11 @@ module ID(
     assign inst_j       = op_d[6'b00_0010];
     assign inst_jalr    = op_d[6'b00_0000] & func_d[6'b00_1001];
 
+
     assign stallreq = (pre_inst_is_load & ex_rf_we & (rs == ex_rf_waddr | rt == ex_rf_waddr)) ? 1'b1 : 1'b0;
 
     // rs to reg1
-    assign sel_alu_src1[0] = inst_ori | inst_addiu | inst_subu | inst_jr |
+    assign sel_alu_src1[0] = inst_ori | inst_addiu | inst_subu | 
                              inst_addu | inst_or | inst_xor | inst_lw | inst_sw |
                              inst_add | inst_addi | inst_sub | inst_slt | inst_slti |
                              inst_sltu | inst_sltiu | inst_and | inst_andi | inst_nor |
@@ -359,10 +362,11 @@ module ID(
     assign pc_plus_4 = id_pc + 32'h4;
 
     assign rs_eq_rt = (data1 == data2);
-    assign rs_ge_z  = (data1 >= 0);
-    assign rs_gt_z  = (data1 > 0);
-    assign rs_le_z  = (data1 <= 0);
-    assign rs_lt_z  = (data1 < 0);
+    assign rs_ge_z  = (!data1[31]);//>=
+    assign rs_gt_z  = ((!data1[31])&&data1!=0);//>
+    assign rs_le_z  = (data1 == 0 | data1[31]);//<=
+    assign rs_lt_z  = (data1[31]);//<
+    
 
 
     assign br_e = inst_beq & rs_eq_rt | 
