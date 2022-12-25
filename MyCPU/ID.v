@@ -178,28 +178,37 @@ module ID(
     	.in  (rt  ),
         .out (rt_d )
     );
-
+    
+    decoder_5_32 u2_decoder_5_32(
+        .in  (rd  ),
+        .out (rd_d )
+    );
+    
+    decoder_5_32 u3_decoder_5_32(
+        .in  (sa  ),
+        .out (sa_d )
+    );
     
     assign inst_ori     = op_d[6'b00_1101];
     assign inst_lui     = op_d[6'b00_1111];
     assign inst_addiu   = op_d[6'b00_1001];
     assign inst_beq     = op_d[6'b00_0100];
-    assign inst_subu    = op_d[6'b00_0000] & func_d[6'b10_0011];
-    assign inst_jr      = op_d[6'b00_0000] & func_d[6'b00_1000];
+    assign inst_subu    = op_d[6'b00_0000] & func_d[6'b10_0011] & sa_d[5'b0_0000];
+    assign inst_jr      = op_d[6'b00_0000] & func_d[6'b00_1000] & rt_d[5'b0_0000] & rd_d[5'b0_0000] & sa_d[5'b0_0000];
     assign inst_jal     = op_d[6'b00_0011];
-    assign inst_addu    = op_d[6'b00_0000] & func_d[6'b10_0001];
+    assign inst_addu    = op_d[6'b00_0000] & func_d[6'b10_0001] & sa_d[5'b0_0000];
     assign inst_bne     = op_d[6'b00_0101];
-    assign inst_sll     = op_d[6'b00_0000] & func_d[6'b00_0000];
-    assign inst_or      = op_d[6'b00_0000] & func_d[6'b10_0101];
-    assign inst_xor     = op_d[6'b00_0000] & func_d[6'b10_0110];
+    assign inst_sll     = op_d[6'b00_0000] & func_d[6'b00_0000] & rs_d[5'b0_0000];
+    assign inst_or      = op_d[6'b00_0000] & func_d[6'b10_0101] & sa_d[5'b0_0000];
+    assign inst_xor     = op_d[6'b00_0000] & func_d[6'b10_0110] & sa_d[5'b0_0000];
     assign inst_lw      = op_d[6'b10_0011];
     assign inst_sw      = op_d[6'b10_1011];
-    assign inst_add     = op_d[6'b00_0000] & func_d[6'b10_0000];
+    assign inst_add     = op_d[6'b00_0000] & func_d[6'b10_0000] & sa_d[5'b0_0000];
     assign inst_addi    = op_d[6'b00_1000];
-    assign inst_sub     = op_d[6'b00_0000] & func_d[6'b10_0010];
-    assign inst_slt     = op_d[6'b00_0000] & func_d[6'b10_1010];
+    assign inst_sub     = op_d[6'b00_0000] & func_d[6'b10_0010] & sa_d[5'b0_0000];
+    assign inst_slt     = op_d[6'b00_0000] & func_d[6'b10_1010] & sa_d[5'b0_0000];
     assign inst_slti    = op_d[6'b00_1010];
-    assign inst_sltu    = op_d[6'b00_0000] & func_d[6'b10_1011];
+    assign inst_sltu    = op_d[6'b00_0000] & func_d[6'b10_1011] & sa_d[5'b0_0000];
     assign inst_sltiu   = op_d[6'b00_1011];
     assign inst_lb      = 1'b0;
     assign inst_lbu     = 1'b0;
@@ -207,17 +216,17 @@ module ID(
     assign inst_lhu     = 1'b0;
     assign inst_sb      = op_d[6'b10_1000];
     assign inst_sh      = op_d[6'b10_1001];
-    assign inst_and     = op_d[6'b00_0000] & func_d[6'b10_0100];
+    assign inst_and     = op_d[6'b00_0000] & func_d[6'b10_0100] & sa_d[5'b0_0000];
     assign inst_andi    = op_d[6'b00_1100];
-    assign inst_nor     = op_d[6'b00_0000] & func_d[6'b10_0111];
+    assign inst_nor     = op_d[6'b00_0000] & func_d[6'b10_0111] & sa_d[5'b0_0000];
     assign inst_xori    = op_d[6'b00_1110];
 
 
-    assign inst_srl     = op_d[6'b00_0000] & func_d[6'b00_0010];
-    assign inst_sllv    = op_d[6'b00_0000] & func_d[6'b00_0100];
-    assign inst_srav    = op_d[6'b00_0000] & func_d[6'b00_0111];
-    assign inst_sra     = op_d[6'b00_0000] & func_d[6'b00_0011];
-    assign inst_srlv    = op_d[6'b00_0000] & func_d[6'b00_0110];
+    assign inst_srl     = op_d[6'b00_0000] & func_d[6'b00_0010] & rs_d[5'b0_0000];
+    assign inst_sllv    = op_d[6'b00_0000] & func_d[6'b00_0100] & sa_d[5'b0_0000];
+    assign inst_srav    = op_d[6'b00_0000] & func_d[6'b00_0111] & sa_d[5'b0_0000];
+    assign inst_sra     = op_d[6'b00_0000] & func_d[6'b00_0011] & rs_d[5'b0_0000];
+    assign inst_srlv    = op_d[6'b00_0000] & func_d[6'b00_0110] & sa_d[5'b0_0000];
 
     assign inst_bgez    = op_d[6'b00_0001] & rt_d[5'b0_0001];
     assign inst_bgtz    = op_d[6'b00_0111] & rt_d[5'b0_0000];
@@ -227,7 +236,7 @@ module ID(
     assign inst_bgezal  = op_d[6'b00_0001] & rt_d[5'b1_0001];
     assign inst_bltzal  = op_d[6'b00_0001] & rt_d[5'b1_0000];
     assign inst_j       = op_d[6'b00_0010];
-    assign inst_jalr    = op_d[6'b00_0000] & func_d[6'b00_1001];
+    assign inst_jalr    = op_d[6'b00_0000] & func_d[6'b00_1001] & rt_d[5'b0_0000] & sa_d[5'b0_0000];
 
 
     assign stallreq = (pre_inst_is_load & ex_rf_we & (rs == ex_rf_waddr | rt == ex_rf_waddr)) ? 1'b1 : 1'b0;
@@ -266,7 +275,8 @@ module ID(
 
 
     assign op_add = inst_addiu | inst_jal | inst_addu | inst_lw | inst_sw |
-                    inst_add | inst_addi | inst_sb | inst_sh | inst_jalr ;
+                    inst_add | inst_addi | inst_sb | inst_sh | inst_jalr | inst_bltzal |
+                    inst_bgezal;
     assign op_sub = inst_subu | inst_sub;
     assign op_slt = inst_slt | inst_slti;
     assign op_sltu = inst_sltu | inst_sltiu;
@@ -301,7 +311,7 @@ module ID(
                    inst_add | inst_addi | inst_sub | inst_slt | inst_slti |
                    inst_sltu | inst_sltiu| inst_and | inst_andi | inst_nor |
                    inst_xori | inst_srl | inst_sllv | inst_srav | inst_sra |
-                   inst_srlv | inst_bgezal |inst_bltzal | inst_jalr ;
+                   inst_srlv | inst_bgezal | inst_bltzal | inst_jalr ;
 
 
 
