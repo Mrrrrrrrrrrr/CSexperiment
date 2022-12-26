@@ -7,6 +7,8 @@
 `define WB_TO_RF_WD 38
 `define EX_TO_RF_WD 38
 `define MEM_TO_RF_WD 38
+`define HILO_WD 72
+`define EX_HILO_WD 66
 
 `define LoadBus 5
 `define SaveBus 3
