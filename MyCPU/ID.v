@@ -341,9 +341,7 @@ module ID(
                          inst_lbu | inst_lh | inst_lhu;
 
     // write enable
-    assign data_ram_wen = inst_sb ? 4'b0001 :
-                          inst_sh ? 4'b0011 :
-                          inst_sw ? 4'b1111 : 4'b0000;
+    assign data_ram_wen = inst_sw | inst_sb | inst_sh ? 4'b1111 : 4'b0000;
 
 
 
