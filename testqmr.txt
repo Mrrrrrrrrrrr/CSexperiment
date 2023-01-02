@@ -1,2 +1,0 @@
-This is my first commit with git shell.
-QMR 2022.11.06
