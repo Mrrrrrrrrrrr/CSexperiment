@@ -1,4 +1,4 @@
-`include "defines.vh"
+`include "lib/defines.vh"
 module MEM(
     input wire clk,
     input wire rst,
